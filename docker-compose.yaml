@@ -8,7 +8,19 @@ services:
         volumes:
             - './symfony:/www/symfony'
             - './.docker/nginx/nginx.conf:/etc/nginx/conf/conf.d/default.conf'
+        ports:
+            - '8080:80'
 
+    php_sf:
+        container_name: php_sf
+        build: ./.docker/php
+        working_dir: /www/symfony
+        user: '1000'
+        volumes:
+            - './symfony/:/www/symfony'
+            - './symfony/var:/www/symfony/var'
+            - './symfony/vendor:/www/symfony/vendor'
+            - './.docker/php/php-ini-overrides.ini:/etc/php/8.2/fpm/conf.d/99-overrides.ini'
 
     db_postgres:
         container_name: db_postgres_sf
@@ -21,3 +33,15 @@ services:
             - './data/pg/sf:/var/lib/postgresql/data'
         ports:
             - '5432:5432'
+
+    composer_sf:
+        container_name: composer_sf
+        image: composer:2.5.8
+        user: '1000:1000'
+        working_dir: /www/symfony
+        volumes:
+            - './symfony:/www/symfony'
+            - '/.docker/composer/cache:/tmp/cache'
+        tty: true
+        stdin_open: true
+        command: [ "bash" ]
